@@ -35,7 +35,7 @@ else
     BASH_PATH="/bin/bash"
     TERMUX=false
 
-    sudo apt-get install -y git python2.7
+    sudo apt-get install -y git python3
 fi
 
 echo "[✔] Checking directories...";

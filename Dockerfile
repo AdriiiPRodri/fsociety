@@ -1,5 +1,5 @@
 # Use Python 2.7 Slim
-FROM python:2.7-slim
+FROM python:3.7-slim
 
 # Update Repos
 RUN apt-get update \
@@ -18,5 +18,5 @@ RUN git clone https://github.com/Manisso/fsociety.git \
 # Change workdir
 WORKDIR /root/.fsociety/
 
-# Hack to keep the container running
-CMD python -c "import signal; signal.pause()"
+## Hack to keep the container running
+#CMD python -c "import signal; signal.pause()"
