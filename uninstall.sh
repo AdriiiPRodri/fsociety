@@ -19,7 +19,6 @@ if [ "$PREFIX" = "/data/data/com.termux/files/usr" ]; then
     BIN_DIR="$PREFIX/bin/"
     BASH_PATH="$PREFIX/bin/bash"
     TERMUX=true
-    pkg uninstall -y git python2
 elif [ "$(uname)" = "Darwin" ]; then
     INSTALL_DIR="/usr/local/fsociety"
     BIN_DIR="/usr/local/bin/"
@@ -31,7 +30,6 @@ else
     BASH_PATH="/bin/bash"
     TERMUX=false
 
-    sudo apt-get remove -y git python2.7
 fi
 
 echo "[✔] Checking directories...";
