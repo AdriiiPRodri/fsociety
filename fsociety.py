@@ -16,6 +16,7 @@
 #                             Author : Manisso
 
 from core import common, informationGathering, passwordAttacks
+from core.webHacking import brutex
 
 import argparse
 import base64
